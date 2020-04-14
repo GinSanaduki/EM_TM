@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # ReplyMessages.awk
 # gawk -f AWKScripts/ReplyMessages.awk -v Mode=JudgeSkipped
 # gawk -f AWKScripts/ReplyMessages.awk -v Mode=JudgeSkipped_IS_255

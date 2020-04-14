@@ -22,12 +22,14 @@
 # ------------------------------------------------------------------
 
 BEGIN{
+	ErrorBit = 0;
 	switch(GeneMercariMode){
 		case "NORMAL":
 			break;
 		case "HTML":
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	
@@ -44,6 +46,7 @@ BEGIN{
 			FS = ",";
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	
@@ -72,6 +75,7 @@ BEGIN{
 	OtherError = "予期せぬエラーが発生しました。";
 	ArraysCnt = 1;
 	NonArraysCnt = 1;
+	OutArraysCnt = 1;
 }
 
 # ------------------------------------------------------------------
@@ -90,6 +94,9 @@ BEGIN{
 # ------------------------------------------------------------------
 
 END{
+	if(ErrorBit != 0){
+		exit 99;
+	}
 	switch(Mode){
 		case "Sentinel_02_EXTEND":
 			exit;

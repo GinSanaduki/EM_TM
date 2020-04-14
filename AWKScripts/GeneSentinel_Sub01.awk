@@ -135,6 +135,7 @@ function GENE_EXCLUSION_CONTROL(SWITCHBACK, TABS, TAB_STR, TAB_STR_DEF){
 
 function OUT_EXCEPTION(OUT_MESSAGES, SWITCHBACK, TABS, TAB_STR, TAB_STR_DEF, BUILD_MESSAGES){
 	if(OUT_MESSAGES == ""){
+		ErrorBit++;
 		exit 99;
 	}
 	SWITCHBACK = SWITCHBACK + 0;
@@ -191,6 +192,7 @@ function OUT_EXCEPTION(OUT_MESSAGES, SWITCHBACK, TABS, TAB_STR, TAB_STR_DEF, BUI
 			print TAB_STR"sys.exit(4)" > Sentinel;
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 }

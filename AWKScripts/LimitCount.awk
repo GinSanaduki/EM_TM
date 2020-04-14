@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # LimitCount.awk
 # awk -f AWKScripts/LimitCount.awk
 

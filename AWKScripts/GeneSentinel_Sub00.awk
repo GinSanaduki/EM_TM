@@ -34,6 +34,7 @@ function Gene_Sentinel(){
 			break;
 	}
 	print "	Hash_Judge = 1" > Sentinel;
+	# ハッシュ判定で異常が発生した場合、関連する出力ファイルを全て削除
 	print "if Hash_Judge == 0:" > Sentinel;
 	RMCMD_01 = "rm -f \\\""SubShellArrays[ArraysCnt][7]"\\\" > /dev/null 2>&1";
 	RMCMD_02 = "rm -f \\\""SubShellArrays[ArraysCnt][8]"\\\" > /dev/null 2>&1";
@@ -48,12 +49,13 @@ function Gene_Sentinel(){
 			break;
 	}
 	print "if Hash_Judge == 1:" > Sentinel;
+	# python内部でのワンライナーShellコマンド発行なので、ビルトインのスイッチングは不要
 	FileSizeCMD = "echo \\\""SubShellArrays[ArraysCnt][1]"\\\" | awk -f AWKScripts/FileSizeJudge.awk  -v GeneMercariMode="GeneMercariMode;
 	print "	FileSize_RCode = subprocess.run(\""FileSizeCMD"\", shell = True)" > Sentinel;
 	print "	FileSize_RCode_Res = FileSize_RCode.returncode" > Sentinel;
 	print "	if FileSize_RCode_Res == 0:" > Sentinel;
 	print "		print(\"00\", end=\"\")" > Sentinel;
-
+	
 	ALERTCMD_Main = "gawk -f AWKScripts/AlertMessages.awk";
 	ALERTCMD_Option01 = " -v MESSAGE=SKIPPED";
 	ALERTCMD_Option02 = " -v PAGENUMBER="k;
@@ -86,7 +88,9 @@ function Gene_Sentinel(){
 	GENE_EXCLUSION_CONTROL("1");
 	
 	print "try:" > Sentinel;
-	print "	driver.get(\047https://www.mercari.com/jp/search/?page="k"&keyword="SubShellArrays[ArraysCnt][5]"\047)" > Sentinel;
+	# 検索URL組み立て時のパーセントエンコーディング
+	Keyword_Inspected = Inspector(SubShellArrays[ArraysCnt][5]);
+	print "	driver.get(\047https://www.mercari.com/jp/search/?page="k"&keyword="Keyword_Inspected"\047)" > Sentinel;
 	# 要素取得に30秒まで待つ
 	print "	WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)" > Sentinel;
 	print "except TimeoutException as e:" > Sentinel;
@@ -249,6 +253,7 @@ function RM(RM_FILE){
 
 function HashCheck(HashCheck_HTML, HashCheck_ScreenShot, HashCheck_HTMLFile, HashCheck_ScreenShotFile){
 	if(HashCheck_HTML == "" || HashCheck_ScreenShot == "" || HashCheck_HTMLFile == "" || HashCheck_ScreenShotFile == ""){
+		ErrorBit++;
 		exit 99;
 	}
 	# 対象のハッシュ値をこの時点で検証し、問題がなければ生成をスキップし、255を返送する
@@ -310,6 +315,10 @@ function HashCheck(HashCheck_HTML, HashCheck_ScreenShot, HashCheck_HTMLFile, Has
 
 function Reload_SubShell(){
 	Len_SubShellArrays = length(SubShellArrays);
+	if(Len_SubShellArrays <= 0){
+		ErrorBit++;
+		exit 99;
+	}
 	for(i in SubShellArrays){
 		Remainder = i % 3;
 		switch(Remainder){
@@ -327,6 +336,7 @@ function Reload_SubShell(){
 				XAxisCnt++;
 				break;
 			default:
+				ErrorBit++;
 				exit 99;
 		}
 	}
@@ -336,6 +346,10 @@ function Reload_SubShell(){
 
 function Reload_WrapperShell(){
 	Len_SubShellArrays = length(WrapperShellArrays);
+	if(Len_SubShellArrays <= 0){
+		ErrorBit++;
+		exit 99;
+	}
 	for(i in WrapperShellArrays){
 		Remainder = i % 3;
 		switch(Remainder){
@@ -353,10 +367,56 @@ function Reload_WrapperShell(){
 				XAxisCnt++;
 				break;
 			default:
+				ErrorBit++;
 				exit 99;
 		}
 	}
 }
 
 # ------------------------------------------------------------------
+
+function Inspector(Inspector_KeyWord){
+	if(Inspector_KeyWord == ""){
+		ErrorBit++;
+		exit 99;
+	}
+	# https://www.ipentec.com/document/web-url-invalid-char
+	# URLで使用可能な文字、使用できない文字
+	# RFC2396
+	# シングルクォート
+	gsub("\047","%27",Inspector_KeyWord);
+	# シャープ
+	# C#とかで探すときに困るからね
+	gsub("\043","%23",Inspector_KeyWord);
+	# バックスラッシュ
+	gsub("\\\\134","%5C",Inspector_KeyWord);
+	# キャレット
+	# ^については、先頭に認識されるので、4文字目以降を取得する
+	gsub("\136","%5E",Inspector_KeyWord);
+	Inspector_KeyWord = substr(Inspector_KeyWord,4);
+	# 角カッコ開き
+	gsub("\\\133","%5B",Inspector_KeyWord);
+	# 角カッコ閉じ
+	gsub("\135","%5D",Inspector_KeyWord);
+	# RFC3986
+	# コロン
+	gsub("\072","%3A",Inspector_KeyWord);
+	# クエスチョン記号
+	gsub("\077","%3F",Inspector_KeyWord);
+	# スラント (スラッシュ、除算記号)
+	gsub("\057","%2F",Inspector_KeyWord);
+	# アットマーク
+	gsub("\100","%40",Inspector_KeyWord);
+	# ドル記号
+	# $については、終端に認識されるので、4つ戻す
+	gsub("\044","%24",Inspector_KeyWord);
+	Inspector_KeyWord = substr(Inspector_KeyWord,1,length(Inspector_KeyWord) - 3);
+	# アンド記号
+	gsub("\046","%26",Inspector_KeyWord);
+	# セミコロン
+	gsub("\073","%3B",Inspector_KeyWord);
+	# 等号
+	gsub("\075","%3D",Inspector_KeyWord);
+	return Inspector_KeyWord;
+}
 

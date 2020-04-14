@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # ReplyDirTime.awk
 # gawk -f AWKScripts/ReplyDirTime.awk -v Mode=01
 # gawk -f AWKScripts/ReplyDirTime.awk -v Mode=02

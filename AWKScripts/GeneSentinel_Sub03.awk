@@ -10,18 +10,25 @@ function Gene_Monitor_Killer(){
 		case "Sentinel_03":
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	print "#!/bin/sh" > Monitor_Killer;
 	print "# sh "Monitor_Killer > Monitor_Killer;
 	print "# bashdb "Monitor_Killer > Monitor_Killer;
 	print "" > Monitor_Killer;
+	print ". ./ShellScripts/BuiltIn_Check.sh" > Monitor_Killer;
+	print "" > Monitor_Killer;
 	print "while :" > Monitor_Killer;
 	print "do" > Monitor_Killer;
 	print "	ls "Sentinel_Bit" > /dev/null 2>&1" > Monitor_Killer;
 	print "	RetCode=$?" > Monitor_Killer;
-	print "	test $RetCode -ne 0 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > Monitor_Killer;
-	print "	test $RetCode -ne 0 && exit" > Monitor_Killer;
+	print "	case \"$RetCode\" in" > Monitor_Killer;
+	print "		\"0\")" > Monitor_Killer;
+	print "			ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > Monitor_Killer;
+	print "			exit 0" > Monitor_Killer;
+	print "	esac" > Monitor_Killer;
+	print "	" > Monitor_Killer;
 	print "done" > Monitor_Killer;
 	print "" > Monitor_Killer;
 }
@@ -37,6 +44,7 @@ function Gene_ExecShell(){
 		case "Sentinel_03":
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	ExecShell = MainDir"/Exec_"Mode".sh";
@@ -44,13 +52,15 @@ function Gene_ExecShell(){
 	print "# sh "ExecShell > ExecShell;
 	print "# bashdb "ExecShell > ExecShell;
 	print "" > ExecShell;
+	print ". ./ShellScripts/BuiltIn_Check.sh" > ExecShell;
+	print "" > ExecShell;
 	
 	switch(Mode){
 		case "Sentinel_02":
 			print "rm -f "ResultCSV" > /dev/null 2>&1" > ExecShell;
 			# CSVに、本件処理対象外の行を出力する
 			for(i in NonArrays){
-				print "echo \""NonArrays[i]"\" >> "ResultCSV > ExecShell;
+				print "$ECHO\""NonArrays[i]"\" >> "ResultCSV > ExecShell;
 			}
 			break;
 		default:
@@ -90,19 +100,19 @@ function Gene_ExecShell(){
 		print "RETRY_CNT=0" > ExecShell;
 		print "while :" > ExecShell;
 		print "do" > ExecShell;
-		print "	test $RETRY_CNT -gt 5 && echo \"リトライ許容回数を超過したため、異常終了します。\"" > ExecShell;
-		print "	test $RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
+		print "	$TEST$RETRY_CNT -gt 5 && $ECHO\"リトライ許容回数を超過したため、異常終了します。\"" > ExecShell;
+		print "	$TEST$RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
 		switch(Mode){
 			case "Sentinel_01":
-				print "	test $RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
-				print "	test $RETRY_CNT -gt 5 && : > "Sentinel_Bit > ExecShell;
+				print "	$TEST$RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
+				print "	$TEST$RETRY_CNT -gt 5 && : > "Sentinel_Bit > ExecShell;
 				break;
 			case "Sentinel_03":
-				print "	test $RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
-				print "	test $RETRY_CNT -gt 5 && : > "Sentinel_Bit > ExecShell;
+				print "	$TEST$RETRY_CNT -gt 5 && ps -aux | grep Monitor_Sentinel | grep -v grep | awk -f AWKScripts/GeneKill.awk | sh > /dev/null 2>&1" > ExecShell;
+				print "	$TEST$RETRY_CNT -gt 5 && : > "Sentinel_Bit > ExecShell;
 				break;
 		}
-		print "	test $RETRY_CNT -gt 5 && exit 99" > ExecShell;
+		print "	$TEST$RETRY_CNT -gt 5 && exit 99" > ExecShell;
 		# ループ内で処理で使用するビットパネルのみを削除
 		if(BitPanelArraysXY[i][1] != ":"){
 			print "	"BitPanelArraysXY[i][1] > ExecShell;
@@ -114,8 +124,8 @@ function Gene_ExecShell(){
 			print "	"BitPanelArraysXY[i][3] > ExecShell;
 		}
 		# ChromeやChrome Driver、Seleniumのプロセス等を一旦削除
-		print "	test $RETRY_CNT -gt 1 && sh ./ShellScripts/Sweeper.sh" > ExecShell;
-		print "	test $RETRY_CNT -gt 1 && sleep 3" > ExecShell;
+		print "	$TEST$RETRY_CNT -gt 1 && sh ./ShellScripts/Sweeper.sh" > ExecShell;
+		print "	$TEST$RETRY_CNT -gt 1 && sleep 3" > ExecShell;
 		# python or ラッパーShellを実行
 		switch(SubShellArraysXY[i][1]){
 			case "-c \047exit 255\047":
@@ -180,36 +190,62 @@ function Gene_ExecShell(){
 		print "	RetCode_02=$?" > ExecShell;
 		print "	wait $python_03_pid" > ExecShell;
 		print "	RetCode_03=$?" > ExecShell;
-		# RetCode_01の復帰値の振り分け
-		Sorting("1",SubShellArraysXY[i][1]);
-		# RetCode_02の復帰値の振り分け
-		Sorting("2",SubShellArraysXY[i][2]);
-		# RetCode_03の復帰値の振り分け
-		Sorting("3",SubShellArraysXY[i][3]);
-		# RetCode_01、RetCode_02、RetCode_03がすべて255なら、スイーパを起動する必要はない
-		print "	test $RetCode_01_IS_255 -eq 0 && test $RetCode_02_IS_255 -eq 0 && test $RetCode_03_IS_255 -eq 0 && break" > ExecShell;
+		print "	$ECHO\"$RetCode_01 $RetCode_02 $RetCode_03\" | awk -f AWKScripts/RetCodeJudge.awk" > ExecShell;
+		print "	RetCode_RetCodeJudge=$?" > ExecShell;
+		print "	case \"$RetCode_RetCodeJudge\" in" > ExecShell;
+		print "		\"255\")" > ExecShell;
+		print "			break" > ExecShell;
+		print "			;;" > ExecShell;
+		print "	esac" > ExecShell;
 		# ChromeやChrome Driver、Seleniumのプロセス等を一旦削除
 		print "	sh ./ShellScripts/Sweeper.sh" > ExecShell;
 		print "	sleep 3" > ExecShell;
-		# RetCode_01、RetCode_02、RetCode_03がすべて0か255の場合に無限ループから脱出
-		print "	test $RetCode_01 -eq 0 -o $RetCode_01 -eq 255 && test $RetCode_02 -eq 0 -o $RetCode_02 -eq 255 && test $RetCode_03 -eq 0 -o $RetCode_03 -eq 255 && break" > ExecShell;
+		print "	case \"$RetCode_RetCodeJudge\" in" > ExecShell;
+		print "		\"0\")" > ExecShell;
+		print "			break" > ExecShell;
+		print "			;;" > ExecShell;
+		print "	esac" > ExecShell;
 		print "	RETRY_CNT=$(( RETRY_CNT + 1 ))" > ExecShell;
-		print "	echo \"リトライ：$RETRY_CNT回目\"" > ExecShell;
+		print "	$ECHO\"リトライ：$RETRY_CNT回目\"" > ExecShell;
 		print "done" > ExecShell;
 		print "" > ExecShell;
 	}
+	InsertSentinel();
+	print "$ECHO\"全件の取得処理が完了しました。\"" > ExecShell;
+	switch(Mode){
+		case "Sentinel_03":
+			print "$ECHO\"CSVの出力を開始します・・・\"" > ExecShell;
+			print ": > \""ResultCSV"\"" > ExecShell;
+			print "" > ExecShell;
+			if(length(OutArrays) < 1){
+				ErrorBit++;
+				exit 99;
+			}
+			for(i in OutArrays){
+				print "$ECHO\""OutArrays[i]"\" >> "ResultCSV > ExecShell;
+			}
+			print "" > ExecShell;
+			print "$ECHO\"CSVの出力が完了しました。\"" > ExecShell;
+			break;
+	}
+	print "" > ExecShell;
+	print "exit 0" > ExecShell;
+	print "" > ExecShell;
+}
+
+# ------------------------------------------------------------------
+
+function InsertSentinel(){
 	# Monitor_Killerの起動センチネル
 	switch(Mode){
 		case "Sentinel_01":
-			print ": > "Sentinel_Bit > ExecShell;
 			break;
 		case "Sentinel_03":
-			print ": > "Sentinel_Bit > ExecShell;
 			break;
+		default:
+			return;
 	}
-	print "echo \"全件の取得処理が完了しました。\"" > ExecShell;
-	print "exit 0" > ExecShell;
-	print "" > ExecShell;
+	print ": > "Sentinel_Bit > ExecShell;
 }
 
 # ------------------------------------------------------------------
@@ -223,6 +259,8 @@ function Gene_MonitorShell(){
 	print "# sh "MonitorShell > MonitorShell;
 	print "# bashdb "MonitorShell > MonitorShell;
 	print "" > MonitorShell;
+	print ". ./ShellScripts/BuiltIn_Check.sh" > MonitorShell;
+	print "" > MonitorShell;
 	print "trap \"sh ./ShellScripts/Sweeper.sh\" 1 2 3 15" > MonitorShell;
 	print "StartTime=`gawk -f AWKScripts/ReplyDirTime.awk -v Mode=03`" > MonitorShell;
 	print "HTMLMaxCnt="length(Sentinel_Arrays_HTML) > MonitorShell;
@@ -234,42 +272,41 @@ function Gene_MonitorShell(){
 	print "EndTime=$(( StartTime + HTMLMaxCnt * 60 ))" > MonitorShell;
 	print "while :" > MonitorShell;
 	print "do" > MonitorShell;
-	print "	echo $EndTime | awk -f AWKScripts/LimitCount.awk" > MonitorShell;
+	print "	$ECHO$EndTime | awk -f AWKScripts/LimitCount.awk" > MonitorShell;
 	print "	RetCode_00=$?" > MonitorShell;
 	print "	DATE=`date \"+%Y年%m月%d日 %H時%M分%S秒\"`" > MonitorShell;
-	print "	test $RetCode_00 -eq 99 && echo \"監視予定時刻を超過したため、監視を終了します。　$DATE\" && exit 99" > MonitorShell;
+	print "	$TEST$RetCode_00 -eq 99 && $ECHO\"監視予定時刻を超過したため、監視を終了します。　$DATE\" && exit 99" > MonitorShell;
 	print "	HTMLCnt=0" > MonitorShell;
 	print "	ScreenShotCnt=0" > MonitorShell;
 	# BitPanelの存在を検知し、BitPanelが「99」、「09」の場合は、異常終了。
 	# 「0」の場合、HTMLCntをインクリメントし、「00」の場合、HTMLCntとScreenShotCntをインクリメントする。
-	for(i in Sentinel_BitPanelArrays){
-		print "	ls \""Sentinel_BitPanelArrays[i]"\" > /dev/null 2>&1" > MonitorShell;
+	for(i in SubShellArrays){
+		print "	ls \""SubShellArrays[i][3]"\" > /dev/null 2>&1" > MonitorShell;
 		print "	RetCode_01=$?" > MonitorShell;
-		print "	test $RetCode_01 -eq 0 && awk -f AWKScripts/Monitor_Sub01.awk \""Sentinel_BitPanelArrays[i]"\"" > MonitorShell;
+		print "	$TEST$RetCode_01 -eq 0 && awk -f AWKScripts/Monitor_Sub01.awk \""SubShellArrays[i][3]"\"" > MonitorShell;
 		print "	RetCode_02=$?" > MonitorShell;
-		print "	DATE=`date \"+%Y年%m月%d日 %H時%M分%S秒\"`" > MonitorShell;
 		switch(GeneMercariMode){
 			case "NORMAL":
-				print "	test $RetCode_01 -eq 0 -a $RetCode_02 -eq 1 && HTMLCnt=$(( HTMLCnt + 1 ))" > MonitorShell;
-				print "	test $RetCode_01 -eq 0 -a $RetCode_02 -eq 2 && HTMLCnt=$(( HTMLCnt + 1 )) && ScreenShotCnt=$(( ScreenShotCnt + 1 ))" > MonitorShell;
+				print "	$TEST$RetCode_01 -eq 0 -a $RetCode_02 -eq 1 && HTMLCnt=$(( HTMLCnt + 1 ))" > MonitorShell;
+				print "	$TEST$RetCode_01 -eq 0 -a $RetCode_02 -eq 2 && HTMLCnt=$(( HTMLCnt + 1 )) && ScreenShotCnt=$(( ScreenShotCnt + 1 ))" > MonitorShell;
 				break;
 			case "HTML":
 				# HTMLモードの場合、ビットパネル出力は00、99しかない
-				print "	test $RetCode_01 -eq 0 -a $RetCode_02 -eq 2 && HTMLCnt=$(( HTMLCnt + 1 ))" > MonitorShell;
+				print "	$TEST$RetCode_01 -eq 0 -a $RetCode_02 -eq 2 && HTMLCnt=$(( HTMLCnt + 1 ))" > MonitorShell;
 				break;
 		}
 	}
 	print "	DATE=`date \"+%Y年%m月%d日 %H時%M分%S秒\"`" > MonitorShell;
-	print "	HTML_Percent=`echo \"$HTMLCnt\" \"$HTMLMaxCnt\" | awk -f AWKScripts/ReplyProgress.awk`" > MonitorShell;
-	print "	echo \"実行中　：　HTML取得　：　$HTMLCnt / $HTMLMaxCnt件（$HTML_Percent％完了）　$DATE\"" > MonitorShell;
+	print "	HTML_Percent=`$ECHO\"$HTMLCnt\" \"$HTMLMaxCnt\" | awk -f AWKScripts/ReplyProgress.awk`" > MonitorShell;
+	print "	$ECHO\"実行中　：　HTML取得　：　$HTMLCnt / $HTMLMaxCnt件（$HTML_Percent％完了）　$DATE\"" > MonitorShell;
 	switch(GeneMercariMode){
 		case "NORMAL":
-			print "	ScreenShot_Percent=`echo \"$ScreenShotCnt\" \"$ScreenShotMaxCnt\" | awk -f AWKScripts/ReplyProgress.awk`" > MonitorShell;
-			print "	echo \"実行中　：　スクリーンショット取得　：　$ScreenShotCnt / $ScreenShotMaxCnt件（$ScreenShot_Percent％完了）\"　$DATE" > MonitorShell;
-			print "	test $HTML_Percent -ge 100 -a $ScreenShot_Percent -ge 100 && echo \"監視を終了します。\" && exit 0" > MonitorShell;
+			print "	ScreenShot_Percent=`$ECHO\"$ScreenShotCnt\" \"$ScreenShotMaxCnt\" | awk -f AWKScripts/ReplyProgress.awk`" > MonitorShell;
+			print "	$ECHO\"実行中　：　スクリーンショット取得　：　$ScreenShotCnt / $ScreenShotMaxCnt件（$ScreenShot_Percent％完了）\"　$DATE" > MonitorShell;
+			print "	$TEST$HTML_Percent -ge 100 -a $ScreenShot_Percent -ge 100 && $ECHO\"監視を終了します。\" && exit 0" > MonitorShell;
 			break;
 		case "HTML":
-			print "	test $HTML_Percent -ge 100 && echo \"監視を終了します。\" && exit 0" > MonitorShell;
+			print "	$TEST$HTML_Percent -ge 100 && $ECHO\"監視を終了します。\" && exit 0" > MonitorShell;
 			break;
 	}
 	print "	sleep 5" > MonitorShell;
@@ -286,6 +323,7 @@ function Gene_SupervisorShell(){
 		case "Sentinel_03":
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	# 統括Shell
@@ -321,13 +359,14 @@ function Sorting(Sorting_Code, Sorting_Script){
 		case "3":
 			break;
 		default:
+			ErrorBit++;
 			exit 99;
 	}
 	
 	# 復帰値の振り分け
-	print "	test $RetCode_0"Sorting_Code" -eq 0" > ExecShell;
+	print "	$TEST$RetCode_0"Sorting_Code" -eq 0" > ExecShell;
 	print "	RetCode_0"Sorting_Code"_IS_00=$?" > ExecShell;
-	print "	test $RetCode_0"Sorting_Code"_IS_00 -eq 1 && test $RetCode_0"Sorting_Code" -eq 255" > ExecShell;
+	print "	$TEST$RetCode_0"Sorting_Code"_IS_00 -eq 1 && $TEST$RetCode_0"Sorting_Code" -eq 255" > ExecShell;
 	print "	RetCode_0"Sorting_Code"_IS_255=$?" > ExecShell;
 	
 	# 255の場合、起因がEXIT_255以外かつSentinel_02以外の場合、ReplyMessages.awkをコールする
@@ -339,7 +378,7 @@ function Sorting(Sorting_Code, Sorting_Script){
 				case "Sentinel_02":
 					break;
 				default:
-					print "	test $RetCode_0"Sorting_Code"_IS_255 -eq 0 && echo \""Sorting_Script"\" | gawk -f AWKScripts/ReplyMessages.awk -v Mode=JudgeSkipped_IS_255" > ExecShell;
+					print "	$TEST$RetCode_0"Sorting_Code"_IS_255 -eq 0 && $ECHO\""Sorting_Script"\" | gawk -f AWKScripts/ReplyMessages.awk -v Mode=JudgeSkipped_IS_255" > ExecShell;
 					break;
 			}
 			break;
@@ -354,10 +393,10 @@ function Sorting(Sorting_Code, Sorting_Script){
 				case "Sentinel_02":
 					break;
 				default:
-					print "	test $RetCode_0"Sorting_Code"_IS_00 -eq 0 && echo \""Sorting_Script"\" | awk -f AWKScripts/FileSizeJudge.awk -v GeneMercariMode="GeneMercariMode > ExecShell;
+					print "	$TEST$RetCode_0"Sorting_Code"_IS_00 -eq 0 && $ECHO\""Sorting_Script"\" | awk -f AWKScripts/FileSizeJudge.awk -v GeneMercariMode="GeneMercariMode > ExecShell;
 					print "	FileSizeJudge_0"Sorting_Code"=$?" > ExecShell;
 					# ファイルサイズチェックで何らかの異常が発生した場合、99で再度実行させる
-					print "	test $RetCode_0"Sorting_Code"_IS_00 -eq 0 && test $FileSizeJudge_0"Sorting_Code" -ne 0 && RetCode_0"Sorting_Code"=99" > ExecShell;
+					print "	$TEST$RetCode_0"Sorting_Code"_IS_00 -eq 0 && $TEST$FileSizeJudge_0"Sorting_Code" -ne 0 && RetCode_0"Sorting_Code"=99" > ExecShell;
 					break;
 			}
 			break;

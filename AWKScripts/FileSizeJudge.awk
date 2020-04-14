@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # FileSizeJudge.awk
 # awk -f AWKScripts/FileSizeJudge.awk -v GeneMercariMode=NORMAL
 # awk -f AWKScripts/FileSizeJudge.awk -v GeneMercariMode=HTML

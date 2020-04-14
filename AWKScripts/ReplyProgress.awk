@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # ReplyProgress.awk
 # awk -f AWKScripts/ReplyProgress.awk
 

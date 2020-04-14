@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # GeneKill.awk
 # awk -f AWKScripts/GeneKill.awk
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 # Monitor_Sub01.awk
 # gawk -f AWKScripts/Monitor_Sub01.awk Sentinel_01_BitPanelArrays[i]
 
