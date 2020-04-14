@@ -2,6 +2,8 @@
 # GeneLocker_02.sh
 # sh ./ShellScripts/GeneLocker_02.sh
 
+. ./ShellScripts/BuiltIn_Check.sh
+
 # 復帰値が1：ロック（1）の取得に成功
 # 復帰値が2：ロック（2）の取得に成功
 # 復帰値が3：ロック（3）の取得に成功

@@ -1,16 +1,40 @@
 #!/bin/sh
 # SearchNextPage.sh
 # sh ./ShellScripts/SearchNextPage.sh hoge.html
+# bashdb ./ShellScripts/SearchNextPage.sh hoge.html
+
+. ./ShellScripts/BuiltIn_Check.sh
 
 ls "$1" > /dev/null 2>&1
-test $? -ne 0 && echo "1" && exit 99
+RetCode=$?
+case "$RetCode" in
+	"0")
+		;;
+	*)
+		$ECHO"1"
+		exit 99
+esac
 
-test -s "$1"
-test $? -ne 0 && echo "1" && exit 99
+$TEST-s "$1"
+RetCode=$?
+case "$RetCode" in
+	"0")
+		;;
+	*)
+		$ECHO"1"
+		exit 99
+esac
 
 fgrep -B 1 "<i class=\"icon-arrow-double-right\"></i>" "$1" | \
 fgrep -q "<a href="
-test $? -ne 0 && echo "1" && exit 99
+RetCode=$?
+case "$RetCode" in
+	"0")
+		;;
+	*)
+		$ECHO"1"
+		exit 99
+esac
 
 # URLはマルチバイト文字ではなくURLエンコードされているため、マルチバイト用にgawkを指定する必要はない。
 fgrep -B 1 "<i class=\"icon-arrow-double-right\"></i>" "$1" | \

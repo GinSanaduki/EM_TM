@@ -2,6 +2,8 @@
 # GeneLocker_01.sh
 # sh ./ShellScripts/GeneLocker_01.sh
 
+. ./ShellScripts/BuiltIn_Check.sh
+
 # 復帰値が0：ロックの取得に成功
 # 復帰値が1：ロックの取得に失敗
 
@@ -25,7 +27,7 @@ awk 'BEGIN{NowTime = systime(); print ":";}{GapTime = NowTime - $1; if(GapTime >
 sh  > /dev/null 2>&1
 
 ln -s $$ $LOCK_FILE_00 > /dev/null 2>&1
-test $? -eq 0 && exit 0
+$TEST$? -eq 0 && exit 0
 
 exit 1
 

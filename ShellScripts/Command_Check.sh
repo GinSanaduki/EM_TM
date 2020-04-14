@@ -1,9 +1,12 @@
 #!/bin/sh
 # Command_Check.sh
 # sh ./ShellScripts/Command_Check.sh
+# bashdb ./ShellScripts/Command_Check.sh
 
 # https://qiita.com/richmikan@github/items/bd4b21cf1fe503ab2e5c
 # どの環境でも使えるシェルスクリプトを書くためのメモ ver4.60 - Qiita
+
+. ./ShellScripts/BuiltIn_Check.sh
 
 which which >/dev/null 2>&1 || {
 	which() {
@@ -12,17 +15,117 @@ which which >/dev/null 2>&1 || {
 	}
 }
 
-which gawk > /dev/null 2>&1
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはgawkが必要です。"
-test $RetCode -ne 0 && echo "gawkをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL : sudo apt-get install gawk" && exit 99
+Which_Check() {
+	case "$1" in
+		"gawk")
+			Error_Messages_01="このスクリプトは$1が必要です。"
+			Error_Messages_02="$1をインストールしてから、実行してください。"
+			Error_Messages_03="INSTALL : sudo apt-get install $1"
+			;;
+		"python")
+			Error_Messages_01="このスクリプトは$1""3が必要です。"
+			Error_Messages_02="$1をインストールしてから、実行してください。"
+			Error_Messages_03="INSTALL : sudo apt-get install $1""3.7"
+			;;
+		"pip")
+			Error_Messages_01="このスクリプトは$1が必要です。"
+			Error_Messages_02="$1をインストールしてから、実行してください。"
+			Error_Messages_03="INSTALL : sudo apt-get install python-$1"
+			;;
+		"google-chrome")
+			Error_Messages_01="このスクリプトはGoogle Chromeが必要です。"
+			Error_Messages_02="Google Chromeをインストールしてから、実行してください。"
+			Error_Messages_03="INSTALL : sudo dpkg -i google-chrome-stable_current_amd64.deb"
+			;;
+		"chromedriver")
+			;;
+		*)
+			$ECHO"INVALID ARGUMENT."
+			exit 99
+	esac
+	which $1 > /dev/null 2>&1
+	RetCode_Which_Check=$?
+	case "$RetCode_Which_Check" in
+		"0")
+			return 0
+			;;
+		*)
+			case "$1" in
+				*)
+					$PRINTF'%s\n%s\n%s\n' "$Error_Messages_01" "$Error_Messages_02" "$Error_Messages_03"
+					;;
+			esac
+	esac
+	exit 99
+}
 
-which python > /dev/null 2>&1
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはpython3が必要です。"
-test $RetCode -ne 0 && echo "pythonをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL : sudo apt install python3.7" && exit 99
+Freeze_Check() {
+	case "$1" in
+		"selenium")
+			Error_Messages_01="このスクリプトは$1が必要です。"
+			Error_Messages_02="$1をインストールしてから、実行してください。"
+			Error_Messages_03="INSTALL : pip install $1"
+			;;
+		*)
+			$ECHO"INVALID ARGUMENT."
+			exit 99
+	esac
+	pip freeze | fgrep -q "$1=="
+	RetCode_Freeze_Check=$?
+	case "$RetCode_Freeze_Check" in
+		"0")
+			return 0
+			;;
+		*)
+			case "$1" in
+				*)
+					$PRINTF'%s\n%s\n%s\n' "$Error_Messages_01" "$Error_Messages_02" "$Error_Messages_03"
+					;;
+			esac
+	esac
+	exit 99
+}
+
+Version_Check() {
+	case "$1" in
+		"google-chrome")
+			;;
+		"chromedriver")
+			;;
+		*)
+			$ECHO"INVALID ARGUMENT."
+			exit 99
+	esac
+	COMMAND_VERSION=`$1 --version`
+	case "$1" in
+		"google-chrome")
+			REQUIRED_VERSION="Google Chrome 71.0.3578.80 "
+			;;
+		"chromedriver")
+			REQUIRED_VERSION="ChromeDriver 2.46.628388 (4a34a70827ac54148e092aafb70504c4ea7ae926)"
+			;;
+	esac
+	$TEST "$COMMAND_VERSION" = "$REQUIRED_VERSION"
+	RetCode_Version_Check=$?
+	case "$RetCode_Version_Check" in
+		"0")
+			return 0
+			;;
+		*)
+			case "$1" in
+				"google-chrome")
+					$ECHO"Google Chromeのバージョンを、Google Chrome 71.0.3578.80にしてください。"
+					;;
+				"chromedriver")
+					$ECHO"Chrome Driverのバージョンを、ChromeDriver 2.46.628388にしてください。"
+					;;
+			esac
+	esac
+	exit 99
+}
+
+Which_Check gawk
+Which_Check python
 
 # https://qiita.com/t-iguchi/items/7b664e8d7fe4bb3646ae
 # wsl+ubuntu+python+djangoの開発環境を構築する - Qiita
@@ -41,23 +144,9 @@ test $RetCode -ne 0 && echo "INSTALL : sudo apt install python3.7" && exit 99
 # python -V
 # →Python 3.7.6
 
-which python > /dev/null 2>&1
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはpipが必要です。"
-test $RetCode -ne 0 && echo "pipをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL :  sudo apt install python-pip" && exit 99
-
-pip freeze | fgrep -q "selenium=="
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはseleniumが必要です。"
-test $RetCode -ne 0 && echo "seleniumをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL :  pip install selenium" && exit 99
-
-which google-chrome > /dev/null 2>&1
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはGoogle Chromeが必要です。"
-test $RetCode -ne 0 && echo "Google Chromeをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL :  sudo dpkg -i google-chrome-stable_current_amd64.deb" && exit 99
+Which_Check pip
+Freeze_Check selenium
+Which_Check google-chrome
 
 # https://qiita.com/ma-tsu-ba-ra/items/25e404387d1726d21cc9
 # WindowsとWSLでHeadless Chromeを使ってみよう！ - Qiita
@@ -94,11 +183,7 @@ test $RetCode -ne 0 && echo "INSTALL :  sudo dpkg -i google-chrome-stable_curren
 # fc-list
 # （IPAゴシック, IPA明朝などが表示される）
 
-CHROME_VERSION=`google-chrome --version`
-REQUIRED_VERSION="Google Chrome 71.0.3578.80 "
-test "$CHROME_VERSION" = "$REQUIRED_VERSION"
-RetCode=$?
-test $RetCode -ne 0 && echo "Google Chromeのバージョンを、Google Chrome 71.0.3578.80にしてください。" && exit 99
+Version_Check google-chrome
 
 # https://chromedriver.storage.googleapis.com/index.html?path=2.46/
 # https://loumo.jp/wp/archive/20181009120041/
@@ -117,23 +202,8 @@ test $RetCode -ne 0 && echo "Google Chromeのバージョンを、Google Chrome 
 # Updateしてしまうと、勝手に最新版にupdateされてしまうので、
 # sudo dpkg -r google-chrome-stableを打ってやり直してください。
 
-which chromedriver > /dev/null 2>&1
-RetCode=$?
-test $RetCode -ne 0 && echo "このスクリプトはChrome Driverが必要です。"
-test $RetCode -ne 0 && echo "Chrome Driverをインストールしてから、実行してください。"
-test $RetCode -ne 0 && echo "INSTALL :  curl -O https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip"
-test $RetCode -ne 0 && echo "INSTALL :  unzip chromedriver_linux64.zip"
-test $RetCode -ne 0 && echo "INSTALL :  rm -f chromedriver_linux64.zip > /dev/null 2>&1"
-test $RetCode -ne 0 && echo "INSTALL :  chmod +x chromedriver"
-test $RetCode -ne 0 && echo "INSTALL :  sudo cp -p chromedriver /usr/local/bin/chromedriver"
-test $RetCode -ne 0 && echo "INSTALL :  rm -f chromedriver > /dev/null 2>&1" && exit 99
-
-DRIVER_VERSION=`chromedriver --version`
-DRIVER_REQUIRED_VERSION="ChromeDriver 2.46.628388 (4a34a70827ac54148e092aafb70504c4ea7ae926)"
-
-test "$DRIVER_VERSION" = "$DRIVER_REQUIRED_VERSION"
-RetCode=$?
-test $RetCode -ne 0 && echo "Chrome Driverのバージョンを、ChromeDriver 2.46.628388にしてください。" && exit 99
+Which_Check chromedriver
+Version_Check chromedriver
 
 exit 0
 
