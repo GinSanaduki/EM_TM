@@ -1,0 +1,16 @@
+^"@context"
+^"@type"
+^"offers"
+^<td>$
+^<div>$
+^<a$
+^href="https://www.mercari.com/jp/login/.*$
+^<meta name="description"
+^<h1 class="item-name">
+^"image": 
+^<div class="item-sold-out-badge">
+^<div class="item-price-box
+^<span class="item-price
+^<section class=".*$
+^</section>$
+^<div class="item-description.*$
