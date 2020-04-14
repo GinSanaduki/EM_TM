@@ -47,7 +47,7 @@ sh ./ShellScripts/GeneMercari.sh HTML
 ```
 # This is the recommended operating mode.
 
-# 必ず、Define_SearchWord.confに検索したいキーワードを記載してから実行してください。
+# Be sure to enter the keyword you want to search in Define_SearchWord.conf before executing.
 
 # Licenses
 This program is under the terms of the BSD 3-Clause License.  
