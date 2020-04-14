@@ -1,4 +1,3 @@
 # EM_TM
-メルカリ出品監視スクリプト
+Exhibition monitoring Targetting Mercari.
 
-生成されるPythonスクリプトは、GenerateSampleを参考にしてほしい。
