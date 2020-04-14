@@ -35,3 +35,21 @@ Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsy
 # There is also a version conflict with google chrome, which is a headless browser.
 # so other than this fixed version will not work.
 
+# Usage
+* Get even screenshots in action
+```bash
+sh ./ShellScripts/GeneMercari.sh NORMAL
+```
+# It is not recommended because it takes a long time to process and the size of the file to be acquired is orders of magnitude larger.
+* Get only HTML
+```bash
+sh ./ShellScripts/GeneMercari.sh HTML
+```
+# This is the recommended operating mode.
+
+# 必ず、Define_SearchWord.confに検索したいキーワードを記載してから実行してください。
+
+# Licenses
+This program is under the terms of the BSD 3-Clause License.  
+See https://opensource.org/licenses/BSD-3-Clause.  
+
