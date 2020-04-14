@@ -17,6 +17,21 @@ Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsy
 
 # Needs Commands and Browser
 * GAWK(the GNU implementation of the AWK programming language) version 4.0 or later.
+  * Recommended version : GNU Awk 4.1.4, API: 1.1 (GNU MPFR 4.0.1, GNU MP 6.1.2) or GNU Awk 5.0.1, API: 2.0
 * Python(Python is an interpreted, high-level, general-purpose programming language. Created by Guido van Rossum.)
   * Recommended version : Python 3.7.6
-* 
+* pip
+    * Selenium installed in pip.
+    ```bash
+    $ pip freeze | fgrep "selenium=="
+    selenium==3.141.0
+    $
+    ```
+* google-chrome
+    * Need Version : Google Chrome 71.0.3578.80 
+* chromedriver
+    * Need Version : ChromeDriver 2.46.628388  
+
+# There is also a version conflict with google chrome, which is a headless browser.
+# so other than this fixed version will not work.
+
