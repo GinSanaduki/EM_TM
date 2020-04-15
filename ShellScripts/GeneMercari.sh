@@ -302,9 +302,6 @@ sort -t "`printf '\t'`" -k 5,5 -k 8n,8 -k 7n,7 | \
 uniq | \
 awk -f AWKScripts/ADD_OutHTML.awk > $MainDir/Component.tsv
 
-# Debug
-ConnectCMD="WGET"
-
 awk -f AWKScripts/GeneCURL.awk -v ConnectMode=$ConnectCMD $MainDir/Component.tsv > $MainDir/GeneShell.sh
 $TEST$? -ne 0 && exit 99
 
