@@ -33,7 +33,7 @@ Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsy
     * Need Version : ChromeDriver 2.46.628388  
 * curl(command-line tool (curl) for transferring data using various network protocols) or wget(a computer program that retrieves content from web servers.)
 
-# Why do I need Curl or Wget commands while using Selenium?
+# Why do I need Curl command or Wget command while using Selenium?
 Originally, I do not want to use Selenium, which has many necessary requirements, if possible.  
 Among them, when I searched for mercari and directly accessed the search URL with the Curl command or Wget command, it was regarded as a robot crawler and a 403 error was returned.  
 Therefore, since it was necessary to access via the browser, Selenium is automatically operating the browser.  
