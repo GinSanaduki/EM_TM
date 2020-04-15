@@ -34,11 +34,11 @@ Works on Android(on Termux, UserLAnd, and other...) / Windows(WSL, Windows Subsy
 * curl(command-line tool (curl) for transferring data using various network protocols) or wget(a computer program that retrieves content from web servers.)
 
 # Why do I need Curl or Wget commands while using selenium?
-Originally, I do not want to use Selenium, which has many necessary requirements, if possible.
-Among them, when I searched for mercari and directly accessed the search URL with the Curl command or Wget command, it was regarded as a robot crawler and a 403 error was returned.
-Therefore, it needed to be accessed via a browser.
-However, on the individual product page, even when accessed with the Curl command or Wget command, the HTTP response return code was 200 with success, and normal HTML could be obtained.
-Therefore, the use part of Selenium is kept to a minimum, and the part that can be obtained even when accessed with the Curl command or Wget command is left to the Curl command or Wget command.
+Originally, I do not want to use Selenium, which has many necessary requirements, if possible.  
+Among them, when I searched for mercari and directly accessed the search URL with the Curl command or Wget command, it was regarded as a robot crawler and a 403 error was returned.  
+Therefore, it needed to be accessed via a browser.  
+However, on the individual product page, even when accessed with the Curl command or Wget command, the HTTP response return code was 200 with success, and normal HTML could be obtained.  
+Therefore, the use part of Selenium is kept to a minimum, and the part that can be obtained even when accessed with the Curl command or Wget command is left to the Curl command or Wget command.  
 
 # There is also a version conflict with google chrome, which is a headless browser.
 # so other than this fixed version will not work.
