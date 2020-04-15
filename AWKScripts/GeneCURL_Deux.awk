@@ -1,17 +1,22 @@
 #!/usr/bin/gawk -f
 # GeneCURL_Deux.awk
-# awk -f AWKScripts/GeneCURL_Deux.awk
+# awk -f AWKScripts/GeneCURL_Deux.awk -v ConnectMode=$ConnectCMD
 
 BEGIN{
+	Cnt = 0;
+	if(ConnectMode != "CURL" && ConnectMode != "WGET"){
+		Cnt++;
+		exit;
+	}
 	FS = "\t";
 	print "#!/bin/sh";
 	# ‹¤’Ê•”•ª
 	RetCode_01 = "RetCode_01=$?";
 	Skip_01 = "test $RetCode_01 -eq 0 && echo \"SHA-512 check is OK.\"";
 	Skip_02 = "test $RetCode_01 -eq 0 && echo \"IMG file acquisition skipped.\"";
-	PreCURL_01 = "test $RetCode_01 -ne 0 && echo \"IMG file acquisition start ...\"";
+	PreCONNECT_01 = "test $RetCode_01 -ne 0 && echo \"IMG file acquisition start ...\"";
 	RetCode_02 = "RetCode_02=$?";
-	CURL_Check_02 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"IMG file acquisition complete.\"";
+	CONNECT_Check_02 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"IMG file acquisition complete.\"";
 	SLEEP = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"sleep start...\" && sleep 3";
 }
 
@@ -21,6 +26,9 @@ BEGIN{
 }
 
 END{
+	if(Cnt > 0){
+		exit 99;
+	}
 	print "exit 0";
 	print "";
 }
@@ -38,12 +46,16 @@ function Declare(){
 	
 	SHA512_Check = "sha512sum -c --quiet \""HashFilePath"\" > /dev/null 2>&1";
 	Skip_03 = "test $RetCode_01 -eq 0 && echo \"IMG File : "ImgFilePath", Hash File : "HashFilePath"\"";
-	PreCURL_02 = "test $RetCode_01 -ne 0 && echo \"URL : "$4"\"";
-	PreCURL_03 = "test $RetCode_01 -ne 0 && echo \"IMG File : "ImgFilePath"\"";
-	CURL = "test $RetCode_01 -ne 0 && curl -s \""$4"\" > \""ImgFilePath"\"";
-	CURL_Check_01 = "test $RetCode_01 -ne 0 && test $RetCode_02 -ne 0 && echo \"CURL ERROR : IMG File : "ImgFilePath"\" && exit 99";
-	CURL_Check_03 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"IMG File : "ImgFilePath"\"";
-	CURL_Check_04 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"Hash File : "HashFilePath"\"";
+	PreCONNECT_02 = "test $RetCode_01 -ne 0 && echo \"URL : "$4"\"";
+	PreCONNECT_03 = "test $RetCode_01 -ne 0 && echo \"IMG File : "ImgFilePath"\"";
+	if(ConnectMode == "CURL"){
+		CONNECT = "test $RetCode_01 -ne 0 && curl -s -o \""ImgFilePath"\" \""$4"\"";
+	} else {
+		CONNECT = "test $RetCode_01 -ne 0 && wget -q \""$4"\" -O \""ImgFilePath"\"";
+	}
+	CONNECT_Check_01 = "test $RetCode_01 -ne 0 && test $RetCode_02 -ne 0 && echo \"CONNECT ERROR : IMG File : "ImgFilePath"\" && exit 99";
+	CONNECT_Check_03 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"IMG File : "ImgFilePath"\"";
+	CONNECT_Check_04 = "test $RetCode_01 -ne 0 && test $RetCode_02 -eq 0 && echo \"Hash File : "HashFilePath"\"";
 	SHA512_Exec = "sha512sum \""ImgFilePath"\" > \""HashFilePath"\"";
 	delete ImgArrays;
 }
@@ -55,16 +67,16 @@ function Construct(){
 	print Skip_01;
 	print Skip_02;
 	print Skip_03;
-	print PreCURL_01;
-	print PreCURL_02;
-	print PreCURL_03;
-	print CURL;
+	print PreCONNECT_01;
+	print PreCONNECT_02;
+	print PreCONNECT_03;
+	print CONNECT;
 	print RetCode_02;
-	print CURL_Check_01;
+	print CONNECT_Check_01;
 	print SHA512_Exec;
-	print CURL_Check_02;
-	print CURL_Check_03;
-	print CURL_Check_04;
+	print CONNECT_Check_02;
+	print CONNECT_Check_03;
+	print CONNECT_Check_04;
 	print SLEEP;
 	print "";
 }

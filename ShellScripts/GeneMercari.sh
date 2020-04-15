@@ -29,6 +29,16 @@ esac
 $ECHO"必要なコマンドのチェックを行います・・・"
 sh ./ShellScripts/Command_Check.sh
 test $? -ne 0 && exit 99
+# curlコマンド or wgetコマンドの存在チェック
+type curl > /dev/null 2>&1
+CurlExist=$?
+type wget > /dev/null 2>&1
+WgetExist=$?
+$TEST$CurlExist -ne 0 -o $WgetExist -ne 0 && $ECHO"curlかwgetをインストールしてください。" && exit 99
+
+ConnectCMD="CURL"
+$TEST$CurlExist -ne 0 -a $WgetExist -eq 0 && ConnectCMD="WGET"
+
 $ECHO"コマンドの存在チェックが完了しました。"
 
 trap "sh ./ShellScripts/Sweeper.sh" 1 2 3 15
@@ -292,7 +302,11 @@ sort -t "`printf '\t'`" -k 5,5 -k 8n,8 -k 7n,7 | \
 uniq | \
 awk -f AWKScripts/ADD_OutHTML.awk > $MainDir/Component.tsv
 
-awk -f AWKScripts/GeneCURL.awk $MainDir/Component.tsv > $MainDir/GeneShell.sh
+# Debug
+ConnectCMD="WGET"
+
+awk -f AWKScripts/GeneCURL.awk -v ConnectMode=$ConnectCMD $MainDir/Component.tsv > $MainDir/GeneShell.sh
+$TEST$? -ne 0 && exit 99
 
 sh $MainDir/GeneShell.sh
 $TEST$? -ne 0 && exit 99
@@ -308,7 +322,8 @@ $TEST$? -ne 0 && $ECHO"商品添付イメージファイルが存在しません
 egrep -H -r '^商品添付イメージ' $WorksExhibition_InfoTSV_Dir/*/*.tsv | \
 fgrep -h "https" | \
 awk '{sub(":","\t"); print;}' | \
-awk -f AWKScripts/GeneCURL_Deux.awk > $MainDir/GeneShell.sh
+awk -f AWKScripts/GeneCURL_Deux.awk -v ConnectMode=$ConnectCMD > $MainDir/GeneShell.sh
+$TEST$? -ne 0 && exit 99
 
 sh $MainDir/GeneShell.sh
 $TEST$? -ne 0 && exit 99
